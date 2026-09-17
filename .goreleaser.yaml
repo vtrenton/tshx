@@ -1,0 +1,50 @@
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
+
+archives:
+  - formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+homebrew_casks:
+  - name: tshx
+    binaries:
+      - tshx
+    repository:
+      owner: vtrenton
+      name: homebrew-tap
+    directory: Casks
+    homepage: https://github.com/vtrenton/tshx
+    description: "kubectx-style context switcher for Teleport (tsh)"
+
+release:
+  github:
+    owner: vtrenton
+    name: tshx

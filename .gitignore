@@ -1,1 +1,22 @@
+# build artifacts
 bin/*
+/tshx
+/dist/
+/result
+/result-*
+
+# go
+*.test
+*.out
+coverage.txt
+coverage.html
+
+# editors
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# os
+.DS_Store

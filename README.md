@@ -13,21 +13,34 @@ Teleport stores each cluster you've logged into as a profile file in
 list with the arrow keys and hit Enter, and `tshx` updates
 `current-profile` for you.
 
-## Build
+## Install
+
+```
+go install github.com/vtrenton/tshx@latest
+```
+
+Homebrew (macOS or Linux):
+
+```
+brew install vtrenton/tap/tshx
+```
+
+Nix:
+
+```
+nix run github:vtrenton/tshx
+```
+
+## Build from source
 
 Requires Go.
 
 ```
-go build -o tshx .
+make build      # builds ./tshx
+make install    # go install . onto your $PATH
 ```
 
-Optionally install it onto your `$PATH`:
-
-```
-go install .
-```
-
-(or copy the built `tshx` binary into a directory on your `$PATH`, e.g. `~/go/bin` or `/usr/local/bin`).
+`tshx --version` prints the running version.
 
 ## Usage
 
@@ -54,3 +67,7 @@ tshx -
 ### Environment variables
 
 - `TSH_HOME` — override the Teleport config directory (defaults to `~/.tsh`).
+
+## License
+
+[MIT](LICENSE)

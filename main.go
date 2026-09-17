@@ -18,6 +18,9 @@ const (
 	profileSuffix      = ".yaml"
 )
 
+// version is set at build time via -ldflags "-X main.version=...".
+var version = "dev"
+
 func tshHomeDir() (string, error) {
 	if dir := os.Getenv("TSH_HOME"); dir != "" {
 		return dir, nil
@@ -162,6 +165,11 @@ func runInteractive(tshHome string, profiles []string, current string) error {
 }
 
 func run(args []string) error {
+	if len(args) > 0 && (args[0] == "--version" || args[0] == "-v") {
+		fmt.Println("tshx", version)
+		return nil
+	}
+
 	tshHome, err := tshHomeDir()
 	if err != nil {
 		return err
