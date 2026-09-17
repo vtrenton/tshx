@@ -40,6 +40,7 @@ homebrew_casks:
     repository:
       owner: vtrenton
       name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
     directory: Casks
     homepage: https://github.com/vtrenton/tshx
     description: "kubectx-style context switcher for Teleport (tsh)"
