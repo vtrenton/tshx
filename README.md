@@ -31,26 +31,6 @@ Nix:
 nix run github:vtrenton/tshx
 ```
 
-### macOS security warning
-
-macOS will flag the Homebrew-installed binary as being from an
-"unidentified developer" (or outright call it malware). This is
-because the binary isn't code-signed or notarized by Apple — doing so
-requires an Apple Developer Program membership ($99/year), which this
-project isn't paying for. The binary is not malicious; this is just
-macOS Gatekeeper's default behavior for any unsigned binary downloaded
-from the internet.
-
-To run it anyway, clear the quarantine flag after installing:
-
-```
-xattr -d com.apple.quarantine "$(brew --prefix)/bin/tshx"
-```
-
-**Note:** macOS re-quarantines the binary every time Homebrew downloads a
-new one, so you'll need to re-run this command after every
-`brew upgrade tshx`, not just the first install.
-
 ## Build from source
 
 Requires Go.

@@ -14,12 +14,12 @@
       {
         packages.default = pkgs.buildGoModule {
           pname = "tshx";
-          version = "0.2.0";
+          version = "0.2.1";
           src = ./.;
 
           vendorHash = "sha256-FSqPLnehNEVfyjex4s7kQ4kezLz9zd49QZAvKmeOu9s=";
 
-          ldflags = [ "-s" "-w" "-X main.version=0.2.0" ];
+          ldflags = [ "-s" "-w" "-X main.version=0.2.1" ];
 
           meta = with pkgs.lib; {
             description = "kubectx-style context switcher for Teleport (tsh)";
