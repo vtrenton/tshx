@@ -1,4 +1,4 @@
-module tshx
+module github.com/vtrenton/tshx
 
 go 1.26.7
 
