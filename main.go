@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -36,6 +37,12 @@ func tshHomeDir() (string, error) {
 // profile (<domain>.yaml) in the tsh home directory.
 func listProfiles(tshHome string) ([]string, error) {
 	entries, err := os.ReadDir(tshHome)
+	if errors.Is(err, os.ErrNotExist) {
+		if _, lookErr := exec.LookPath("tsh"); lookErr != nil {
+			return nil, fmt.Errorf("tsh config directory %s not found, and `tsh` isn't on your PATH — install Teleport's tsh client first: https://goteleport.com/docs/installation/", tshHome)
+		}
+		return nil, fmt.Errorf("tsh config directory %s not found — run `tsh login` to log into a cluster first", tshHome)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("could not read tsh directory %s: %w", tshHome, err)
 	}
