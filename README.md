@@ -47,6 +47,10 @@ To run it anyway, clear the quarantine flag after installing:
 xattr -d com.apple.quarantine "$(brew --prefix)/bin/tshx"
 ```
 
+**Note:** macOS re-quarantines the binary every time Homebrew downloads a
+new one, so you'll need to re-run this command after every
+`brew upgrade tshx`, not just the first install.
+
 ## Build from source
 
 Requires Go.

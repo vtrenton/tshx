@@ -117,10 +117,11 @@ func contains(items []string, target string) bool {
 func runInteractive(tshHome string, profiles []string, current string) error {
 	items := make([]string, len(profiles))
 	for i, p := range profiles {
+		tag := checkSession(tshHome, p).tag()
 		if p == current {
-			items[i] = p + " (current)"
+			items[i] = fmt.Sprintf("%s (current) %s", p, tag)
 		} else {
-			items[i] = p
+			items[i] = fmt.Sprintf("%s %s", p, tag)
 		}
 	}
 
@@ -159,9 +160,11 @@ func runInteractive(tshHome string, profiles []string, current string) error {
 	selected := profiles[idx]
 	if selected == current {
 		fmt.Printf("Already on Teleport cluster %q.\n", selected)
-		return nil
+	} else if err := switchTo(tshHome, selected, current); err != nil {
+		return err
 	}
-	return switchTo(tshHome, selected, current)
+	offerLogin(tshHome, selected)
+	return nil
 }
 
 func run(args []string) error {
@@ -205,7 +208,11 @@ func run(args []string) error {
 		if !contains(profiles, previous) {
 			return fmt.Errorf("previous cluster %q no longer has a profile", previous)
 		}
-		return switchTo(tshHome, previous, current)
+		if err := switchTo(tshHome, previous, current); err != nil {
+			return err
+		}
+		offerLogin(tshHome, previous)
+		return nil
 	}
 
 	if !contains(profiles, target) {
@@ -213,9 +220,14 @@ func run(args []string) error {
 	}
 	if target == current {
 		fmt.Printf("Already on Teleport cluster %q.\n", target)
+		offerLogin(tshHome, target)
 		return nil
 	}
-	return switchTo(tshHome, target, current)
+	if err := switchTo(tshHome, target, current); err != nil {
+		return err
+	}
+	offerLogin(tshHome, target)
+	return nil
 }
 
 func main() {
