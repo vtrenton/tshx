@@ -141,7 +141,16 @@ func offerLogin(tshHome, profile string) {
 		return
 	}
 
-	cmd := exec.Command("tsh", "login", "--proxy="+profile)
+	args := []string{"login", "--proxy=" + profile}
+	// tsh login's --user defaults to the local OS username, not the
+	// Teleport identity on file for this profile, so pin it explicitly.
+	// We only ever land here for an existing (expired) profile, so the
+	// username from its yaml is always the right one to re-authenticate as.
+	if user, err := profileUser(tshHome, profile); err == nil && user != "" {
+		args = append(args, "--user="+user)
+	}
+
+	cmd := exec.Command("tsh", args...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
