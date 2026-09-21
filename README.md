@@ -25,46 +25,14 @@ Homebrew (macOS or Linux):
 brew install vtrenton/tap/tshx
 ```
 
-Nix (imperative, with flakes):
+Nix:
 
 ```
-nix run github:vtrenton/tshx          # try it once
-nix profile install github:vtrenton/tshx
+nix run github:vtrenton/tshx
 ```
 
-Nix (imperative, classic/no flakes):
-
-```
-nix-env -if https://github.com/vtrenton/tshx/archive/refs/heads/master.tar.gz
-```
-
-Nix (declarative — NixOS, home-manager, or your own flake):
-
-Add `tshx` as a flake input and either reference the package directly or
-pull in the overlay to get `pkgs.tshx`:
-
-```nix
-{
-  inputs.tshx.url = "github:vtrenton/tshx";
-
-  outputs = { self, nixpkgs, tshx, ... }: {
-    nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        { nixpkgs.overlays = [ tshx.overlays.default ]; }
-        {
-          environment.systemPackages = [ pkgs.tshx ];
-          # or, without the overlay:
-          # environment.systemPackages = [ tshx.packages.x86_64-linux.default ];
-        }
-      ];
-    };
-  };
-}
-```
-
-The same pattern works in a home-manager flake (`home.packages` instead of
-`environment.systemPackages`).
+See [Nix](#nix) below for declarative NixOS/home-manager setup or
+non-flake installs.
 
 ## Build from source
 
@@ -102,6 +70,49 @@ tshx -
 ### Environment variables
 
 - `TSH_HOME` — override the Teleport config directory (defaults to `~/.tsh`).
+
+## Nix
+
+One-off run, no install:
+
+```
+nix run github:vtrenton/tshx
+```
+
+Install into your profile:
+
+```
+nix profile install github:vtrenton/tshx
+```
+
+No flakes:
+
+```
+nix-env -if https://github.com/vtrenton/tshx/archive/refs/heads/master.tar.gz
+```
+
+Declarative (NixOS, home-manager, or your own flake) — add as an input,
+then either reference `tshx.packages.${system}.default` directly or pull
+in `tshx.overlays.default` to get `pkgs.tshx`:
+
+```nix
+{
+  inputs.tshx.url = "github:vtrenton/tshx";
+
+  outputs = { nixpkgs, tshx, ... }: {
+    nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        { nixpkgs.overlays = [ tshx.overlays.default ]; }
+        { environment.systemPackages = [ pkgs.tshx ]; }
+      ];
+    };
+  };
+}
+```
+
+Same pattern in a home-manager flake (`home.packages` instead of
+`environment.systemPackages`).
 
 ## License
 
