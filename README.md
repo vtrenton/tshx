@@ -2,6 +2,7 @@
 
 A `kubectx`-style context switcher for [Teleport](https://goteleport.com/) (`tsh`).
 
+[![asciicast](https://asciinema.org/a/0tIjxbNR6aTaBjba.svg)](https://asciinema.org/a/0tIjxbNR6aTaBjba)
 ## Purpose
 
 Teleport stores each cluster you've logged into as a profile file in
