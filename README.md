@@ -15,24 +15,30 @@ list with the arrow keys and hit Enter, and `tshx` updates
 
 ## Install
 
-```
-go install github.com/vtrenton/tshx@latest
-```
-
-Homebrew (macOS or Linux):
+*Homebrew:*
 
 ```
 brew install vtrenton/tap/tshx
 ```
 
-Nix:
+*Nix:*
+
+run only (no install):
 
 ```
 nix run github:vtrenton/tshx
 ```
 
-See [Nix](#nix) below for declarative NixOS/home-manager setup or
-non-flake installs.
+Install into your profile:
+
+```
+nix profile add github:vtrenton/tshx
+```
+
+*Go:*
+```
+go install github.com/vtrenton/tshx@latest
+```
 
 ## Build from source
 
@@ -70,49 +76,6 @@ tshx -
 ### Environment variables
 
 - `TSH_HOME` — override the Teleport config directory (defaults to `~/.tsh`).
-
-## Nix
-
-One-off run, no install:
-
-```
-nix run github:vtrenton/tshx
-```
-
-Install into your profile:
-
-```
-nix profile install github:vtrenton/tshx
-```
-
-No flakes:
-
-```
-nix-env -if https://github.com/vtrenton/tshx/archive/refs/heads/master.tar.gz
-```
-
-Declarative (NixOS, home-manager, or your own flake) — add as an input,
-then either reference `tshx.packages.${system}.default` directly or pull
-in `tshx.overlays.default` to get `pkgs.tshx`:
-
-```nix
-{
-  inputs.tshx.url = "github:vtrenton/tshx";
-
-  outputs = { nixpkgs, tshx, ... }: {
-    nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        { nixpkgs.overlays = [ tshx.overlays.default ]; }
-        { environment.systemPackages = [ pkgs.tshx ]; }
-      ];
-    };
-  };
-}
-```
-
-Same pattern in a home-manager flake (`home.packages` instead of
-`environment.systemPackages`).
 
 ## License
 
