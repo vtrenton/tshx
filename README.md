@@ -15,15 +15,15 @@ list with the arrow keys and hit Enter, and `tshx` updates
 
 ## Install
 
-*Homebrew:*
+**Homebrew:**
 
 ```
 brew install vtrenton/tap/tshx
 ```
 
-*Nix:*
+**Nix:**
 
-run only (no install):
+Run only (no install):
 
 ```
 nix run github:vtrenton/tshx
@@ -35,7 +35,7 @@ Install into your profile:
 nix profile add github:vtrenton/tshx
 ```
 
-*Go:*
+**Go:**
 ```
 go install github.com/vtrenton/tshx@latest
 ```
