@@ -4,6 +4,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -109,7 +110,32 @@ func switchTo(tshHome, profile, previousCurrent string) error {
 		return fmt.Errorf("could not switch profile: %w", err)
 	}
 	fmt.Printf("Switched to Teleport cluster %q.\n", profile)
+	warnEnvOverride(profile)
 	return nil
+}
+
+// proxyHost strips any port (and scheme) from a TELEPORT_PROXY value so it
+// can be compared against a profile's proxy domain.
+func proxyHost(proxy string) string {
+	if _, rest, ok := strings.Cut(proxy, "://"); ok {
+		proxy = rest
+	}
+	if host, _, err := net.SplitHostPort(proxy); err == nil {
+		return host
+	}
+	return proxy
+}
+
+// warnEnvOverride warns when TELEPORT_PROXY or TELEPORT_CLUSTER is set in
+// the environment, since tsh gives those precedence over current-profile
+// and would silently ignore the switch tshx just made.
+func warnEnvOverride(profile string) {
+	if proxy := os.Getenv("TELEPORT_PROXY"); proxy != "" && proxyHost(proxy) != profile {
+		fmt.Fprintf(os.Stderr, "tshx: warning: TELEPORT_PROXY=%s is set in your environment and overrides current-profile; tsh will keep using it until you unset it.\n", proxy)
+	}
+	if cluster := os.Getenv("TELEPORT_CLUSTER"); cluster != "" {
+		fmt.Fprintf(os.Stderr, "tshx: warning: TELEPORT_CLUSTER=%s is set in your environment and overrides the cluster tsh selects; unset it if it doesn't belong to %q.\n", cluster, profile)
+	}
 }
 
 func contains(items []string, target string) bool {
@@ -167,6 +193,7 @@ func runInteractive(tshHome string, profiles []string, current string) error {
 	selected := profiles[idx]
 	if selected == current {
 		fmt.Printf("Already on Teleport cluster %q.\n", selected)
+		warnEnvOverride(selected)
 	} else if err := switchTo(tshHome, selected, current); err != nil {
 		return err
 	}
@@ -227,6 +254,7 @@ func run(args []string) error {
 	}
 	if target == current {
 		fmt.Printf("Already on Teleport cluster %q.\n", target)
+		warnEnvOverride(target)
 		offerLogin(tshHome, target)
 		return nil
 	}

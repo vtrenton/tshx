@@ -3,6 +3,7 @@
 A `kubectx`-style context switcher for [Teleport](https://goteleport.com/) (`tsh`).
 
 [![asciicast](https://asciinema.org/a/0tIjxbNR6aTaBjba.svg)](https://asciinema.org/a/0tIjxbNR6aTaBjba)
+
 ## Purpose
 
 Teleport stores each cluster you've logged into as a profile file in
@@ -77,6 +78,11 @@ tshx -
 ### Environment variables
 
 - `TSH_HOME` — override the Teleport config directory (defaults to `~/.tsh`).
+
+`tsh` gives `TELEPORT_PROXY` and `TELEPORT_CLUSTER` precedence over
+`current-profile`, so a switch made by `tshx` has no effect in a shell where
+either is set. `tshx` prints a warning when it detects this; `unset` them to
+let `tshx` take control again.
 
 ## License
 
