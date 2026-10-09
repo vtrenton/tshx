@@ -110,7 +110,7 @@ func switchTo(tshHome, profile, previousCurrent string) error {
 		return fmt.Errorf("could not switch profile: %w", err)
 	}
 	fmt.Printf("Switched to Teleport cluster %q.\n", profile)
-	warnEnvOverride(profile)
+	warnEnvOverride(tshHome, profile)
 	return nil
 }
 
@@ -127,14 +127,16 @@ func proxyHost(proxy string) string {
 }
 
 // warnEnvOverride warns when TELEPORT_PROXY or TELEPORT_CLUSTER is set in
-// the environment, since tsh gives those precedence over current-profile
-// and would silently ignore the switch tshx just made.
-func warnEnvOverride(profile string) {
+// the environment to something that doesn't match profile, since tsh gives
+// those precedence over current-profile and would silently ignore the
+// switch tshx just made. TELEPORT_CLUSTER is checked against the clusters
+// tsh saved CAs for at the profile's last login.
+func warnEnvOverride(tshHome, profile string) {
 	if proxy := os.Getenv("TELEPORT_PROXY"); proxy != "" && proxyHost(proxy) != profile {
 		fmt.Fprintf(os.Stderr, "tshx: warning: TELEPORT_PROXY=%s is set in your environment and overrides current-profile; tsh will keep using it until you unset it.\n", proxy)
 	}
-	if cluster := os.Getenv("TELEPORT_CLUSTER"); cluster != "" {
-		fmt.Fprintf(os.Stderr, "tshx: warning: TELEPORT_CLUSTER=%s is set in your environment and overrides the cluster tsh selects; unset it if it doesn't belong to %q.\n", cluster, profile)
+	if cluster := os.Getenv("TELEPORT_CLUSTER"); cluster != "" && !contains(knownClusters(tshHome, profile), cluster) {
+		fmt.Fprintf(os.Stderr, "tshx: warning: TELEPORT_CLUSTER=%s is set in your environment and overrides the cluster tsh selects; it isn't a known cluster for %q, so unset it if it doesn't belong there.\n", cluster, profile)
 	}
 }
 
@@ -193,7 +195,7 @@ func runInteractive(tshHome string, profiles []string, current string) error {
 	selected := profiles[idx]
 	if selected == current {
 		fmt.Printf("Already on Teleport cluster %q.\n", selected)
-		warnEnvOverride(selected)
+		warnEnvOverride(tshHome, selected)
 	} else if err := switchTo(tshHome, selected, current); err != nil {
 		return err
 	}
@@ -254,7 +256,7 @@ func run(args []string) error {
 	}
 	if target == current {
 		fmt.Printf("Already on Teleport cluster %q.\n", target)
-		warnEnvOverride(target)
+		warnEnvOverride(tshHome, target)
 		offerLogin(tshHome, target)
 		return nil
 	}

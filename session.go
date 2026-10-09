@@ -90,6 +90,24 @@ func checkSession(tshHome, profile string) sessionStatus {
 	}
 }
 
+// knownClusters returns the names of the clusters (root and leaves) whose CA
+// tsh saved for profile at its last login, from keys/<profile>/cas/*.pem.
+// The list is only as fresh as that login, and is empty when the profile
+// has never been logged into.
+func knownClusters(tshHome, profile string) []string {
+	entries, err := os.ReadDir(filepath.Join(tshHome, "keys", profile, "cas"))
+	if err != nil {
+		return nil
+	}
+	var clusters []string
+	for _, e := range entries {
+		if name, ok := strings.CutSuffix(e.Name(), ".pem"); ok && !e.IsDir() {
+			clusters = append(clusters, name)
+		}
+	}
+	return clusters
+}
+
 // formatDuration renders d as a short "1d2h" / "2h15m" / "15m" style string.
 func formatDuration(d time.Duration) string {
 	if d < 0 {
